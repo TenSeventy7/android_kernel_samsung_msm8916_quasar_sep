@@ -39,7 +39,7 @@ BUILD_ZIMAGE()
 	echo " "
 	export ARCH=arm
 	export CROSS_COMPILE=$QS_TOOLCHAIN
-	export LOCALVERSION=-Quasar_Kernel-$QS_VERSION-$QS_VARIANT-$QS_DATE
+	export LOCALVERSION=-Quasar-$QS_VERSION-$QS_VARIANT-$QS_DATE
 	mkdir output
 	make -C $QS_DIR -j$QS_JOBS O=output quasar_msm8916_defconfig VARIANT_DEFCONFIG=$QS_DEFCON SELINUX_DEFCONFIG=quasar_selinux_defconfig
 	make -C $QS_DIR -j$QS_JOBS O=output
@@ -84,24 +84,47 @@ PACK_VARIANT_IMG()
 	mv $QS_DIR/quasar/tools/aik/image-new.img $QS_DIR/quasar/build/boot-$QS_VARIANT-$QS_DATE.img
 	$QS_DIR/quasar/tools/aik/cleanup.sh
 }
+PACK_FORTUNA_ZIP()
+{
+      echo "----------------------------------------------"
+      echo "Packing flashable zip for Grand Prime kernels..."
+      echo " "
+      mkdir -p $QS_DIR/quasar/work
+      mkdir -p $QS_DIR/quasar/work/META-INF/com/google/android
+      mkdir -p $QS_DIR/quasar/work/quasar/fortuna3g
+      mkdir -p $QS_DIR/quasar/work/quasar/fortunafz
+      mkdir -p $QS_DIR/quasar/work/quasar/fortunave3g
+      cp -f $QS_DIR/quasar/tools/flashable/binary $QS_DIR/quasar/work/META-INF/com/google/android/update-binary
+      cp -f $QS_DIR/quasar/tools/flashable/a55 $QS_DIR/quasar/work/META-INF/com/google/android/updater-script
+      sed -i s'/QSVER/v2.0/'g $QS_DIR/quasar/work/META-INF/com/google/android/updater-script
+      cp -f $QS_DIR/quasar/tools/flashable/pronto $QS_DIR/quasar/work/quasar/pronto
+      cp -f $QS_DIR/quasar/tools/flashable/wpsw $QS_DIR/quasar/work/quasar/wpsw
+      mv $QS_DIR/quasar/build/boot-fortuna3g-$QS_DATE.img $QS_DIR/quasar/work/quasar/fortuna3g/boot.img
+      mv $QS_DIR/quasar/build/boot-fortunafz-$QS_DATE.img $QS_DIR/quasar/work/quasar/fortunafz/boot.img
+      mv $QS_DIR/quasar/build/boot-fortunave3g-$QS_DATE.img $QS_DIR/quasar/work/quasar/fortunave3g/boot.img
+      cd $QS_DIR/quasar/work
+      $QS_DIR/quasar/tools/flashable/zip -r -9 - * > $QS_DIR/quasar/build/Quasar_Kernel-$QS_VERSION-$QS_BUILD-FORTUNA.zip
+      cd $QS_DIR
+      rm -r -f $QS_DIR/quasar/work
+}
 PACK_A35_ZIP()
 {
-	echo "----------------------------------------------"
-	echo "Packing flashable zip for A3 2015 kernels..."
-	echo " "
-	mkdir -p $QS_DIR/quasar/work
-	mkdir -p $QS_DIR/quasar/work/META-INF/com/google/android
-	mkdir -p $QS_DIR/quasar/work/quasar/a3ulte
-	cp -f $QS_DIR/quasar/tools/flashable/binary $QS_DIR/quasar/work/META-INF/com/google/android/update-binary
-	cp -f $QS_DIR/quasar/tools/flashable/a35 $QS_DIR/quasar/work/META-INF/com/google/android/updater-script
-	sed -i s'/QSVER/v2.0/'g $QS_DIR/quasar/work/META-INF/com/google/android/updater-script
-	cp -f $QS_DIR/quasar/tools/flashable/pronto $QS_DIR/quasar/work/quasar/pronto
-	cp -f $QS_DIR/quasar/tools/flashable/wpsw $QS_DIR/quasar/work/quasar/wpsw
-	mv $QS_DIR/quasar/build/boot-a3ulte-$QS_DATE.img $QS_DIR/quasar/work/quasar/a3ulte/boot.img
-	cd $QS_DIR/quasar/work
-	$QS_DIR/quasar/tools/flashable/zip -r -9 - * > $QS_DIR/quasar/build/Quasar_Kernel-$QS_VERSION-$QS_BUILD-A35.zip
-	cd $QS_DIR
-	rm -r -f $QS_DIR/quasar/work
+      echo "----------------------------------------------"
+      echo "Packing flashable zip for A3 2015 kernels..."
+      echo " "
+      mkdir -p $QS_DIR/quasar/work
+      mkdir -p $QS_DIR/quasar/work/META-INF/com/google/android
+      mkdir -p $QS_DIR/quasar/work/quasar/a3ulte
+      cp -f $QS_DIR/quasar/tools/flashable/binary $QS_DIR/quasar/work/META-INF/com/google/android/update-binary
+      cp -f $QS_DIR/quasar/tools/flashable/a35 $QS_DIR/quasar/work/META-INF/com/google/android/updater-script
+      sed -i s'/QSVER/v2.0/'g $QS_DIR/quasar/work/META-INF/com/google/android/updater-script
+      cp -f $QS_DIR/quasar/tools/flashable/pronto $QS_DIR/quasar/work/quasar/pronto
+      cp -f $QS_DIR/quasar/tools/flashable/wpsw $QS_DIR/quasar/work/quasar/wpsw
+      mv $QS_DIR/quasar/build/boot-a3ulte-$QS_DATE.img $QS_DIR/quasar/work/quasar/a3ulte/boot.img
+      cd $QS_DIR/quasar/work
+      $QS_DIR/quasar/tools/flashable/zip -r -9 - * > $QS_DIR/quasar/build/Quasar_Kernel-$QS_VERSION-$QS_BUILD-A35.zip
+      cd $QS_DIR
+      rm -r -f $QS_DIR/quasar/work
 }
 PACK_A55_ZIP()
 {
@@ -490,6 +513,70 @@ do
             echo "----------------------------------------------"
             echo "a5ulte_kor kernel build finished."
             echo "boot.img is located into quasar/build."
+            echo "Press any key for end the script."
+            echo "----------------------------------------------"
+            read -n1 -r key
+            break
+            ;;
+        "Grand Prime (build supported variants)")
+            clear
+            echo "----------------------------------------------"
+            echo "Starting build for supported Grand Prime variants."
+            echo "fortuna3g . fortunave3g . fortunafz"
+            echo "Please be patient..."
+            # fortuna3g
+            echo "----------------------------------------------"
+            echo "Cleaning up source..."
+            echo " "
+            CLEAN_SOURCE
+            echo " "
+            echo "----------------------------------------------"
+            echo "Starting fortuna3g kernel build..."
+            QS_VARIANT=fortuna3g
+            QS_DEFCON=quasar_msm8916_fortuna3g_defconfig
+            BUILD_ZIMAGE
+            BUILD_DTB
+            PACK_VARIANT_IMG
+            echo " "
+            echo "----------------------------------------------"
+            echo "fortuna3g kernel build finished."
+            # fortunave3g
+            echo "----------------------------------------------"
+            echo "Preparing for next build..."
+            echo " "
+            CLEAN_SOURCE
+            echo " "
+            echo "----------------------------------------------"
+            echo "Starting fortunave3g kernel build..."
+            QS_VARIANT=fortunave3g
+            QS_DEFCON=quasar_msm8916_fortunave3g_defconfig
+            BUILD_ZIMAGE
+            BUILD_DTB
+            PACK_VARIANT_IMG
+            echo " "
+            echo "----------------------------------------------"
+            echo "fortunave3g kernel build finished."
+            # a5ltechn
+            echo "----------------------------------------------"
+            echo "Preparing for next build..."
+            echo " "
+            CLEAN_SOURCE
+            echo " "
+            echo "----------------------------------------------"
+            echo "Starting fortunafz kernel build..."
+            QS_VARIANT=fortunafz
+            QS_DEFCON=quasar_msm8916_fortunafz_defconfig
+            BUILD_ZIMAGE
+            BUILD_DTB
+            PACK_VARIANT_IMG
+            echo " "
+            echo "----------------------------------------------"
+            echo "fortunafz kernel build finished."
+            PACK_FORTUNA_ZIP
+            echo " "
+            echo "----------------------------------------------"
+            echo "Grand Prime kernels build finished."
+            echo "Flashable zip is located into quasar/build."
             echo "Press any key for end the script."
             echo "----------------------------------------------"
             read -n1 -r key
